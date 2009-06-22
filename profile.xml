@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<profile>
+  <widget_instances>
+    <widget_instance id="1">
+      <widget>
+        <name>squeezebox controller widget</name>
+        <description>This is the squeezebox controller widget.</description>
+        <version>0.1</version>
+        <mode time="30" mode="timeout"/>
+        <access sendable="false" deleteable="false" access="private" virtualable="false"/>
+        <user username="myusername"/>
+        <thumbnail href="file:////mnt/usb/sbcontroller.jpg" contenttype="image/jpeg"/>
+        <movie href="file:////mnt/usb/SBController.swf" contenttype="application/x-shockwave-flash"/>
+      </widget>
+      <access access="private"/>
+      <mode time="30" mode="timeout"/>
+      <widget_parameters>
+		<!-- Required. The address and port if necessary to your SC installation. -->
+        <widget_parameter>
+          <name>sbcontroller_scaddress</name>
+          <value>192.168.1.100:9000</value>
+        </widget_parameter>
+		<!-- Required. This is an authorization code for communicating with your SC installation.
+		     It is unique to your SC installation.
+			 
+			 To get it, use your browser to navigate to:
+			 http://192.168.1.100:9000/xml/?p0=pref
+			 (replace the IP and port as required.)
+			 
+			 It will say 403 Forbidden, and there will be a link on the page similar to this:
+			 http://192.168.1.100:9000/xml/?p0=pref&;cauth=67330341438a459ca091c115041345b6
+			 
+			 Get the value after cauth= and put replace the value below. -->
+        <widget_parameter>
+          <name>sbcontroller_sccauth</name>
+          <value>67330341438a459ca091c115041345b6</value>
+        </widget_parameter>
+		<!-- Optional. If your SC installation is running on a faster server, you can try decreasing
+			 this to speed up updates. Note - SC doesn't like requests that are too frequent and 
+			 will stall requests after a period of time. Defaults to 15000 if not specified. 
+			 Number is in milliseconds. -->
+		<!-- 
+		<widget_parameter>
+          <name>sbcontroller_scupdateinterval</name>
+          <value>8d1047b14c64afd49eef9803ee3b8fde</value>
+        </widget_parameter>
+		-->
+      </widget_parameters>
+    </widget_instance>
+  </widget_instances>
+</profile>
