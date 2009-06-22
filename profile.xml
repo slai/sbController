@@ -3,7 +3,7 @@
   <widget_instances>
     <widget_instance id="1">
       <widget>
-        <name>squeezebox controller widget</name>
+        <name>sbController</name>
         <description>This is the squeezebox controller widget.</description>
         <version>0.1</version>
         <mode time="30" mode="timeout"/>
