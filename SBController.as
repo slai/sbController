@@ -685,8 +685,8 @@ class SBController extends MovieClip
 	//{ squeezebox commands
 	private function sbSendCommand(p0:String, p1:String, p2:String, p3:String, p4:String):Void
 	{
-		//base url - use status header as the response is unnecessary
-		var url:String = "http://" + _SCaddress + "/xml/status_header.xml?player=" + escape(_playerInfo.playerId);
+		//base url
+		var url:String = "http://" + _SCaddress + "/xml/status.xml?player=" + escape(_playerInfo.playerId) + "&omit_playlist=1";
 		
 		//this is a required parameter
 		if (p0 == undefined || p0 == null)
