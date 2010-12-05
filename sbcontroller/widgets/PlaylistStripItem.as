@@ -44,7 +44,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	
 	//{ instance variables
 	// passed in during attachMovie:
-	public var item:PlaylistItem;
+	private var _item:PlaylistItem;
 	private var _maxWidth:Number;
 	private var _maxHeight:Number;
 	
@@ -58,6 +58,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	private var _titleText:TextField;
 	private var _durationText:TextField;
 	private var _statusText:TextField;
+	private var _curCoverArtUrl:String;
 	
 	private var _errorCount:Number;
 	
@@ -95,10 +96,27 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 			setHeight(_maxHeight);
 		else
 			setHeight(240);
+	}
+	
+	public function get item():PlaylistItem
+	{
+		return _item;
+	}
+	
+	public function set item(value:PlaylistItem):Void
+	{
+		if (_item != value)
+		{
+			_item = value;
 			
-		//generate and load UI
-		generateUI();
-		refreshUI();
+			//trace("ITEM [" + _name + "]: " + _item.title);
+			
+			removeAllTextFields();
+			//generate and load UI
+			generateUI();
+			refreshUI();
+			checkLoad();
+		}
 	}
 	
 	private function generateUI():Void
@@ -202,6 +220,24 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_durationText._width = _durationText.textWidth + TEXT_WIDTH_LEEWAY > maxTextWidth ? maxTextWidth : _durationText.textWidth + TEXT_WIDTH_LEEWAY;
 	}
 	
+	private function removeAllTextFields():Void
+	{
+		if (_artistText != null)
+			_artistText.removeTextField();
+		
+		if (_albumText != null)
+			_albumText.removeTextField();
+		
+		if (_titleText != null)
+			_titleText.removeTextField();
+		
+		if (_durationText != null)
+			_durationText.removeTextField();
+			
+		if (_statusText != null)
+			_statusText.removeTextField();
+	}
+	
 	//-----------------------------------------------------------------------------------------------
 	public static function numLoading():Number 
 	{
@@ -234,31 +270,20 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	// load the images when the images are "stopped", unless they're too close.
 	public function checkLoad() 
 	{
-		var offset:Number = this._x + this._parent._x;// + Width/2;
-		if (_loadState == LOADED && _keepLoaded == false)
+		if (_curCoverArtUrl != item.coverArtUrl)
 		{
-			if (offset < -UNLOAD_T || offset > UNLOAD_T)
+			_mcl.unloadClip(_coverArt);
+			
+			if (item.coverArtUrl != null)
 			{
-				//trace('unloading '+this+' (offset '+offset+')');
-				_mcl.unloadClip(_coverArt);
-				_loadState = UNLOADED;
-				dispatchEvent({type:UNLOADED});
-			}
-		} 
-		else if ((_loadState == UNLOADED) && (NumLoading < MAX_LOADING) && (_errorCount < 3))
-		{
-			if ((_parent._isStopped && offset > -LOAD_T1 && offset < LOAD_T1) || (offset > -LOAD_T2 && offset < LOAD_T2)) 
-			{
-				if (item.coverArtUrl != null)
-				{
-					_coverArt = createEmptyMovieClip('coverArt', COVERART_DEPTH);
-					this._timerTest = getTimer();
-					_mcl.loadClip(item.coverArtUrl, _coverArt);
-					NumLoading++;
-					_loadState = LOADING;
-					dispatchEvent({type:LOADING});
-					showLoadingMessage();
-				}
+				_coverArt = createEmptyMovieClip('coverArt', COVERART_DEPTH);
+				this._timerTest = getTimer();
+				_mcl.loadClip(item.coverArtUrl, _coverArt);
+				NumLoading++;
+				_loadState = LOADING;
+				dispatchEvent({type:LOADING});
+				showLoadingMessage();
+				_curCoverArtUrl = item.coverArtUrl;
 			}
 		}
 	}

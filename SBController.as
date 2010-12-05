@@ -382,7 +382,6 @@ class SBController extends MovieClip
 		if (curNode != null)
 		{
 			playlistStart = parseInt(XmlUtil.firstValueOfType(curNode, "from"));
-			trace("raw xml play to: " + XmlUtil.firstValueOfType(curNode, "to"));
 			playlistEnd = parseInt(XmlUtil.firstValueOfType(curNode, "to"));
 		}
 		else
@@ -518,12 +517,7 @@ class SBController extends MovieClip
 		{
 			trace("play start: " + playlistStart);
 			trace("play end: " + playlistEnd);
-			
 			trace("play items: " + _playerState.playlist.length);
-			//for (var bbb:Number = 0; bbb < _playerState.playlist.length; bbb++)
-			//{
-			//	trace(_playerState.playlist[bbb].title + " | pos: " + _playerState.playlist[bbb].position); 
-			//}
 			
 			_xml = null;
 			getPlayerState();
@@ -540,25 +534,25 @@ class SBController extends MovieClip
 			_playlistStrip.addEventListener(PlaylistStrip.CLICKED, Delegate.create(this, playlistStripClicked));
 		}
 		
-		//create copy of playlist items array
-		var playlistItemsCopy:Array = [];
-		for (var i:Number = 0; i < _playerState.playlist.length; i++)
-			playlistItemsCopy.push(_playerState.playlist[i]);
-		
-		//update UI
-		_playlistStrip.processItems(playlistItemsCopy);
-		
-		//find index of current song
-		var curItemIndex:Number = 0;
-		for (var i:Number = 0; i < _playerState.playlist.length; i++)
+		//get prev, current and next items
+		var prevStripItem:PlaylistItem = null, curStripItem:PlaylistItem = null, nextStripItem:PlaylistItem = null;
+		for (var i:Number = 0; i < _playerState.playlist.length; i++) 
 		{
-			if (_playerState.playlist[i].position == _playerState.playlistPosition)
+			curPlaylistItem = _playerState.playlist[i];
+			if (curPlaylistItem.position == _playerState.playlistPosition)
 			{
-				curItemIndex = i;
+				curStripItem = curPlaylistItem;
+				if (i != 0)
+					prevStripItem = _playerState.playlist[i - 1];
+				if (i + 1 < _playerState.playlist.length)
+					nextStripItem = _playerState.playlist[i + 1];
+				
 				break;
 			}
 		}
-		_playlistStrip.setShowingIndex(curItemIndex);
+		
+		//update UI
+		_playlistStrip.processItems(prevStripItem, curStripItem, nextStripItem);
 		
 		// clean up
 		_xml = null;
@@ -596,7 +590,8 @@ class SBController extends MovieClip
 	private function playlistStripMoved():Void
 	{
 		//check if the strip showing index has changed
-		var posDiff:Number = _playlistStrip._items[_playlistStrip.getCurrentIndex()].item.position - _playerState.playlistPosition;
+		var posDiff:Number = _playlistStrip.getCurrentIndex();
+		trace(_playlistStrip.getCurrentIndex());
 		
 		//determine if going to previous or next track
 		if (posDiff < 0)

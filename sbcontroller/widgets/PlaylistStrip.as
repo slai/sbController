@@ -31,21 +31,21 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	private var _itemHeight:Number;
 	
 	public  var _isStopped:Boolean; // used to tell images when it's safe to load
-	private var _itemCount:Number;
 	private var _delay:Number;
 	private var _startTime:Number;
 	private var _startX:Number;
 	private var _startXMouse:Number;
 	private var _deltaX:Number;
 	private var _velocity:Number;
-	private var _lastItem:MovieClip;
 	private var _duration:Number;
-	private var _continuous:Boolean;
 	private var _autoAdvance:Boolean;
-	private var _itemSymbol:String;
-	public var _items:Array;
-	private var _lastCheckLoadPos:Number;
 	private var _moveStartTime:Number;
+	
+	private var _stripItemsAdded:Boolean;
+	private var _prevStripItem:PlaylistStripItem;
+	private var _curStripItem:PlaylistStripItem;
+	private var _nextStripItem:PlaylistStripItem;
+	private var _curShowingIndex:Number;
 	
 	public static var LOADEDFIRST:Number = 1;
 	public static var MOVING:Number = 2;
@@ -56,8 +56,6 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	public var addEventListener:Function;
 	public var removeEventListener:Function;
 	private var dispatchEvent:Function;
-	private var _numLoading:Number = 0;
-	private var _numLoaded:Number = 0;
 	private var _delegateFirstItemReady:Function;
 	private var _delegateItemLoaded:Function;
 	
@@ -67,25 +65,26 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	function PlaylistStrip()
 	{
 		_isStopped = true;
-		_continuous = false;
 		_autoAdvance = false;
 		_xspacing = 320;
 		_itemWidth = 320;
 		_itemHeight = 240;
-		_items = [];
+		_stripItemsAdded = false;
 		GDispatcher.initialize(this);
 		_delegateFirstItemReady = Delegate.create(this, firstItemReady);
 		_delegateItemLoaded = Delegate.create(this, itemLoaded);
+		_curShowingIndex = 0;
 		
 		onClicked = null;
 	}
 
 	//-----------------------------------------------------------------------------------------------
-	public function setAutoAdvance(isAuto:Boolean)
+	// -1 for prev, 0 for cur, 1 for next.
+	public function getCurrentIndex()
 	{
-		_autoAdvance = isAuto;
+		return _curShowingIndex;
 	}
-		
+	
 	public function setItemSpacing(w:Number)
 	{
 		_xspacing = w;
@@ -99,202 +98,108 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		
 	//-----------------------------------------------------------------------------------------------
 	// attach the movie clips for each item, space them out, then start the autoadvancer
-	public function processItems(items:Array, showingIndex:Number) 
+	public function processItems(prevItem:PlaylistItem, curItem:PlaylistItem, nextItem:PlaylistItem) 
 	{
-		if (showingIndex == undefined) 
-			showingIndex = 0;
-	
-		//paint background black so entire movieclip acts as a hotspot
-		moveTo(0, 0);
-		beginFill(0x000000, 1);
-		lineTo(0, _itemWidth);
-		lineTo(_itemWidth, _itemHeight);
-		lineTo(0, _itemHeight);
-		lineTo(0, 0);
-		endFill();
-			
-		if(items.length > 1)
+		if (!_stripItemsAdded)
 		{
+			//paint background black so entire movieclip acts as a hotspot
+			moveTo(0, 0);
+			beginFill(0x000000, 1);
+			lineTo(0, _itemWidth);
+			lineTo(_itemWidth, _itemHeight);
+			lineTo(0, _itemHeight);
+			lineTo(0, 0);
+			endFill();
+			
 			this.onPress = mover;	// when initially touched, switch to the manual mover
 			this.onRelease = this.onReleaseOutside = aligner;	// when touch released, switch to the aligner	
 			this.onEnterFrame = advancer;
 			
-			// ** continuous/circular mode
-			if (_continuous)
-			{
-				var first:String = items[0];
-				var last:String = items[items.length - 1];
-				items.unshift(last);
-				items.push(first);
-			}
+			_x = -_xspacing;
 			
-			//_x = -_xspacing;  
-			_x = -_xspacing * (showingIndex + 1);
-		}
-		
-		_itemCount = items.length;  // count including duplicate first and last items if continuous
-		//_items = new Array();
-		//trace("_itemCount : " + _itemCount);
-		
-		var x:Number = 0;
-		for (var i=0; i<_itemCount; i++) 
-		{
-			var mc_name:String = "item_" + items[i].id;
-			trace("processing for mc item name: " + mc_name);
-			//see if it exists already
+			// create strip items
+			var x:Number = 0;
+			var mc_name:String = null;
 			var uiItem:MovieClip = null;
-			for (var j = 0; j < _items.length; j++)
-			{
-				if (_items[j]._name == mc_name)
-				{
-					uiItem = _items[j];
-					break;
-				}
-			}
 			
-			if (uiItem != null)
-			{
-				//item exists
-				trace("item exists in slot " + i);
-				//put this in the expected place
-				_items[i] = uiItem;
-				//and set correct depth
-				uiItem.swapDepths(_items[i]);
-				
-				//set location
-				uiItem._x = x;
-			}
-			else
-			{
-				//create it
-				trace("item doesn't exist, creating...");
-				uiItem = 
-						MCUtil.CreateWithClass(
+			// prev item
+			mc_name = "item_prev";
+			_prevStripItem = MCUtil.CreateWithClass(
 								PlaylistStripItem, this, mc_name, this.getNextHighestDepth() + 1, 
-								{ _x:x, item:items[i], _maxWidth:_itemWidth, _maxHeight:_itemHeight } );
-				
-				//replace or add, so position in array is right
-				if (_items.length > i)
-				{
-					//replace
-					trace("new item replacing item at " + i);
-					//push to the end of array so it can be removed later if necessary
-					_items.push(_items[i]);
-					_items[i] = uiItem;
-					trace("replaced - " + _items[i]._name);
-				}
-				else
-				{
-					//add
-					trace("adding: " + uiItem._name);
-					_items.push(uiItem);
-				}
-				
-				uiItem.addEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
-				if (_itemCount == 1) { // first image when only 1 image in array
-					uiItem.addEventListener(PlaylistStripItem.LOADED, _delegateFirstItemReady);
-				}
-				else if(i == 1) {  // first visible image
-					uiItem.addEventListener(PlaylistStripItem.LOADED, _delegateFirstItemReady);
-				}
-				if(i==1 || i==_itemCount-2) {
-					uiItem.keepLoaded();
-				}
-			}
+								{ _x:x, _maxWidth:_itemWidth, _maxHeight:_itemHeight } );
 			
+			trace("adding: " + _prevStripItem._name);
+				
+			_prevStripItem.addEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
+			_prevStripItem.keepLoaded();
+			
+			// cur item
 			x += _xspacing;
-			_lastItem = this[mc_name];
+			mc_name = "item_cur";
+			_curStripItem = MCUtil.CreateWithClass(
+								PlaylistStripItem, this, mc_name, this.getNextHighestDepth() + 1, 
+								{ _x:x, _maxWidth:_itemWidth, _maxHeight:_itemHeight } );
+			
+			trace("adding: " + _curStripItem._name);
+				
+			_curStripItem.addEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
+			_curStripItem.keepLoaded();
+			
+			// next item
+			x += _xspacing;
+			mc_name = "item_next";
+			_nextStripItem = MCUtil.CreateWithClass(
+								PlaylistStripItem, this, mc_name, this.getNextHighestDepth() + 1, 
+								{ _x:x, _maxWidth:_itemWidth, _maxHeight:_itemHeight } );
+			
+			trace("adding: " + _nextStripItem._name);
+				
+			_nextStripItem.addEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
+			_nextStripItem.keepLoaded();
+			
+			_delay = InitialDelayTime;
+			_startTime = getTimer();
+			_stripItemsAdded = true;
 		}
 		
-		//remove redundant mc items
-		for (var i:Number = items.length; i < _items.length; i++)
+		// assign playlist items to strip items
+		_prevStripItem.item = prevItem;
+		_curStripItem.item = curItem;
+		_nextStripItem.item = nextItem;
+		checkItemsLoad();
+		
+		// realign so the current item is showing, but only if we aren't moving
+		if (_isStopped)
 		{
-			trace("removing redundant item at " + i + " with id " + _items[i].item.id);
-			
-			var curMCItem:MovieClip = _items[i];
-			
-			//check to see if it exists elsewhere in the array
-			var foundElsewhere:Boolean = false;
-			for (var j:Number = 0; j < i; j++)
-			{
-				if (_items[j] == curMCItem)
-				{
-					foundElsewhere = true;
-					break;
-				}
-			}
-			trace("found elsewhere: " + foundElsewhere);
-			if (!foundElsewhere)
-			{
-				trace("not found elsewhere, removing...");
-				//not found elsewhere, unload and remove
-				_items[i].unloadMovie();
-				_items[i].removeMovieClip();
-				delete curMCItem;
-			}
-			
-			//delete from array
-			_items.splice(i, 1);
+			_x = -_xspacing;
+			_curShowingIndex = 0;
 		}
-		
-		checkItemLoad();
-		_delay = InitialDelayTime;
-		_startTime = getTimer();
-		
-		trace("items");
-		for (var aaa:Number = 0; aaa < items.length; aaa++)
-			trace(items[aaa].id + " pos: " + items[aaa].position);
-		
-		trace("mc items");
-		for (var aaa:Number = 0; aaa < _items.length; aaa++)
-			trace(aaa + " : " + _items[aaa]._name + " at depth " + _items[aaa].getDepth());
 	}
 
 	//-----------------------------------------------------------------------------------------------
 	public function removeAll()
 	{
-		trace(this._name + " removing " + _itemCount + " items");
-		for (var i=0; i<_itemCount; i++) 
-		{
-			var mc_name:String = "item_"+i;
-			var item:MovieClip = this[mc_name];
-			item.removeEventListener(PlaylistStripItem.LOADED, _delegateFirstItemReady);
-			item.removeEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
-			item.removeMovieClip();
-		}
-		_items = new Array();
-		_itemCount = 0;
+		trace(this._name + " removing all items");
+
+		_prevStripItem.removeEventListener(PlaylistStripItem.LOADED, _delegateFirstItemReady);
+		_prevStripItem.removeEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
+		_prevStripItem.removeMovieClip();
+		
+		_curStripItem.removeEventListener(PlaylistStripItem.LOADED, _delegateFirstItemReady);
+		_curStripItem.removeEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
+		_curStripItem.removeMovieClip();
+		
+		_nextStripItem.removeEventListener(PlaylistStripItem.LOADED, _delegateFirstItemReady);
+		_nextStripItem.removeEventListener(PlaylistStripItem.LOADED, _delegateItemLoaded);
+		_nextStripItem.removeMovieClip();
 	}
 	
 	//-----------------------------------------------------------------------------------------------	
 	private function itemLoaded(obj:Object) 
 	{
-		var i:Number = Number(obj.name.split('_')[1]);
-		var index:Number = (i==0) ? (_itemCount - 1) : (i-1);
-		//trace("itemLoaded " + i);
-		dispatchEvent({type:LOADED, index:i});
+		dispatchEvent({type:LOADED, name:obj.name});
 	}
 
-	//-----------------------------------------------------------------------------------------------
-	public function setShowingIndex(index:Number)
-	{
-		//trace("setShowingIndex " + index);
-		_x = -_xspacing * (index); //removed + 1 on index in original code (don't know why it was there)
-		_startTime = getTimer();
-		checkItemLoad();
-		if(this._autoAdvance)
-			this.onEnterFrame = advancer;
-		else
-			delete this.onEnterFrame;
-	}
-	
-	//-----------------------------------------------------------------------------------------------
-	public function getCurrentIndex():Number
-	{
-		var itemIndex:Number = Math.round( -_x / _xspacing); // current item
-		return _continuous ? itemIndex - 1 : itemIndex;   // subtract the duplicated item if continuous mode
-	}
-	
 	//-----------------------------------------------------------------------------------------------
 	function firstItemReady(event:Object)
 	{
@@ -338,33 +243,20 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		//trace('move');
 		var nowXMouse = this._parent._xmouse;
 		var x:Number = _startX+(nowXMouse-_startXMouse);
-		x = Math.max(Math.min(x,0),_xspacing-(_lastItem._x+_lastItem._width));
+		//x = Math.max(Math.min(x,0),_xspacing-(_lastItem._x+_lastItem._width));
 		if (x!=_x) {
 			dispatchEvent({type:MOVING});
 			_velocity = x-_x;// record the velocity
 			_x = x;
-			if(Math.abs(nowXMouse-_lastCheckLoadPos) > _xspacing) {
-				checkItemLoad();
-			}
 		}
 	}
 
 	//-----------------------------------------------------------------------------------------------
-	private function checkItemLoad()
+	private function checkItemsLoad()
 	{
-		_lastCheckLoadPos = this._parent._xmouse;
-		var curr:Number = Math.round(-_x/_xspacing); // current item index
-		//trace("checkItemLoad " + curr);
-		var delta:Number = Math.min(15, Math.floor(_items.length / 2));
-		_items[curr].checkLoad();
-		for(var d:Number = 1; d <= delta; d++) 
-		{
-			var pos1:Number = (curr + d) % _items.length;
-			var pos2:Number = (curr + _items.length - d) % _items.length;
-			//trace("checkLoad: " + pos1 + " , " + pos2);
-			_items[pos1].checkLoad();
-			_items[pos2].checkLoad();
-		}
+		_prevStripItem.checkLoad();
+		_curStripItem.checkLoad();
+		_nextStripItem.checkLoad();
 	}
 	
 	//-----------------------------------------------------------------------------------------------
@@ -381,7 +273,7 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		} else if (_velocity<-10 && remaining<0) {
 			itemIndex++;
 		}
-		itemIndex = Math.max(0,Math.min(itemIndex,_itemCount-1));
+		itemIndex = Math.max(0,Math.min(itemIndex,3-1));
 		_velocity = 0;
 		_startTime = getTimer();
 		_duration = AlignTime;
@@ -413,23 +305,26 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		} 
 		else 
 		{
-			var itemIndex:Number = Math.round(-_x/_xspacing);
 			//trace("align index = " + itemIndex);
-			if(_continuous && itemIndex == _itemCount-1) {
-				//trace("wrap");
-				_x = -_xspacing;
-			}
-			else if(_continuous && itemIndex == 0) {
-				//trace("wrap");
-				_x = -(_itemCount-2) * _xspacing;
-			}
-			else {
-				_x = _startX+_deltaX; // done with this advance, force alignment
-			}
+			_x = _startX+_deltaX; // done with this advance, force alignment
+
 			_delay = DelayTime;
 			_startTime = getTimer();
 			_isStopped = true;
-			checkItemLoad();
+			
+			// -1 so it fits with -1 as prev
+			var itemIndex:Number = Math.round(-_x/_xspacing) - 1;
+			
+			trace("DeltaX: " + _deltaX + ", itemIndex: " + itemIndex);
+			
+			// drag from right to left
+			if (_deltaX < 0 && _curShowingIndex != itemIndex)
+				_curShowingIndex = 1;
+			
+			// drag from left to right
+			if (_deltaX > 0 && _curShowingIndex != itemIndex)
+				_curShowingIndex = -1;
+			
 			dispatchEvent({type:STOPPED});
 			this.onEnterFrame = advancer;
 		}
@@ -444,7 +339,7 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		{
 			var x:Number = _x;
 			var itemIndex:Number = Math.round(-x/_xspacing); // current image
-			if (_continuous || (itemIndex < _itemCount-1))  // any item left?
+			if ((itemIndex < 3 /* total strip items */ -1))  // any item left?
 			{ 
 				_startTime = getTimer(); // set up advance
 				_duration = AdvanceTime;
@@ -478,17 +373,11 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		{			
 			var itemIndex:Number = Math.round(-_x/_xspacing);
 			//trace("advance index = " + itemIndex);
-			if(_continuous && itemIndex == _itemCount-1) {
-				//trace("wrap");
-				_x = -_xspacing;
-			}
-			else {
-				_x = _startX+_deltaX; // doen with this advance, force alignment
-			}
+			_x = _startX + _deltaX; // doen with this advance, force alignment
+			
 			_delay = DelayTime; // set up next advance
 			_startTime = getTimer();
 			_isStopped = true;
-			checkItemLoad();
 			this.onEnterFrame = advancer;
 			dispatchEvent({type:STOPPED});
 		}
