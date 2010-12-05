@@ -103,43 +103,55 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	
 	private function generateUI():Void
 	{
+		//paint background black so entire movieclip acts as a hotspot
+		moveTo(0, 0);
+		beginFill(0x000000, 1);
+		lineTo(0, Width);
+		lineTo(Width, Height);
+		lineTo(0, Height);
+		lineTo(0, 0);
+		endFill();
+		
 		//cover art loaded when needed
 		
 		var textFormat:TextFormat = null;
 		
-		_artistText = this.createTextField("artistText", ARTISTTEXT_DEPTH, 10, 50, 300, 24);
+		_artistText = this.createTextField("artistText", ARTISTTEXT_DEPTH, 10, 50, 300, 30);
+		_artistText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 15;
-			font = "Arial";
+			size = 22;
+			font = "main.ttf";
 			bold = true;
 		}
 		_artistText.setNewTextFormat(textFormat);
 		_artistText.background = true;
 		_artistText.backgroundColor = 0x000000;
 
-		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 70, 300, 24);
+		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 80, 300, 30);
+		_albumText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 15;
-			font = "Arial";
+			size = 22;
+			font = "main.ttf";
 			bold = true;
 		}
 		_albumText.setNewTextFormat(textFormat);
 		_albumText.background = true;
 		_albumText.backgroundColor = 0x000000;
 		
-		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 90, 300, 28);
+		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 110, 300, 40);
+		_titleText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 20;
-			font = "Arial";
+			size = 28;
+			font = "main.ttf";
 			bold = true;
 		}
 		_titleText.setNewTextFormat(textFormat);
@@ -149,13 +161,14 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_titleText.wordWrap = true;
 		
 		
-		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 120, 300, 20);
+		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 150, 300, 25);
+		_durationText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 12;
-			font = "Arial";
+			size = 20;
+			font = "main.ttf";
 			bold = true;
 		}
 		_durationText.setNewTextFormat(textFormat);
@@ -179,7 +192,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_titleText._width = _titleText.textWidth + TEXT_WIDTH_LEEWAY > maxTextWidth ? maxTextWidth : _titleText.textWidth + TEXT_WIDTH_LEEWAY;
 		//adjust for multi-line. 28 comes from the single line height set in generateUI.
 		//cannot rely on textHeight, as it returns a height close but too small for all line to show. weird.
-		_titleText._height = Math.ceil(_titleText.textHeight / 28) * 28;
+		_titleText._height = Math.ceil(_titleText.textHeight / 40) * 40;
 		//trace("title: " + item.title);
 		//trace("title text width and height: " + _titleText.textWidth + " x " + _titleText.textHeight);
 		

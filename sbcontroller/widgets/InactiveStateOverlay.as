@@ -88,29 +88,31 @@
 		this.endFill();
 		
 		//create title text
-		_messageTitleText = this.createTextField("messageTitleText", TITLETEXT_DEPTH, 0, 70, 310, 36);
+		_messageTitleText = this.createTextField("messageTitleText", TITLETEXT_DEPTH, 0, 60, 310, 36);
+		_messageTitleText.embedFonts = true;
 		_messageTitleText.selectable = false;
 		var titleTextFormat:TextFormat = new TextFormat();
 		with (titleTextFormat)
 		{
 			align = "center";
 			color = 0xffffff;
-			size = 25;
-			font = "Arial";
+			size = 40;
+			font = "main.ttf";
 			bold = true;
 		}
 		_messageTitleText.setNewTextFormat(titleTextFormat);
 		
 		//create message text
-		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 140, 320, 24);
+		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 130, 320, 28);
+		_messageText.embedFonts = true;
 		_messageText.selectable = false;
 		var messageTextFormat:TextFormat = new TextFormat();
 		with (messageTextFormat)
 		{
 			align = "center";
 			color = 0x999999;
-			size = 15;
-			font = "Arial";
+			size = 26;
+			font = "main.ttf";
 			bold = true;
 		}
 		_messageText.setNewTextFormat(messageTextFormat);

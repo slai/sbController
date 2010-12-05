@@ -103,7 +103,16 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	{
 		if (showingIndex == undefined) 
 			showingIndex = 0;
-		
+	
+		//paint background black so entire movieclip acts as a hotspot
+		moveTo(0, 0);
+		beginFill(0x000000, 1);
+		lineTo(0, _itemWidth);
+		lineTo(_itemWidth, _itemHeight);
+		lineTo(0, _itemHeight);
+		lineTo(0, 0);
+		endFill();
+			
 		if(items.length > 1)
 		{
 			this.onPress = mover;	// when initially touched, switch to the manual mover

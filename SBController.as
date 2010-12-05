@@ -37,7 +37,7 @@ class SBController extends MovieClip
 	//{ instance variables
 	private var _SCaddress:String = "";
 	private var _SCcauth:String = "";
-	private var _SCUpdateInterval:Number = 15000; //if too often, SC will just refuse to respond
+	private var _SCUpdateInterval:Number = 5000; //if too often, SBS will just refuse to respond
 	
 	private var _playerInfo:PlayerInfo = null;
 	private var _playerState:PlayerState = null;
@@ -69,7 +69,7 @@ class SBController extends MovieClip
 		_SCcauth = _root["sbcontroller_sccauth"];
 
 		if (_root["sbcontroller_scupdateinterval"] != undefined)
-			_SCUpdateInterval = parseInt(_root["sbcontroller_scupdateinterval"]); //otherwise defaults to 15000 (above)
+			_SCUpdateInterval = parseInt(_root["sbcontroller_scupdateinterval"]); //otherwise defaults to 5000 (above)
 		
 		//validate
 		if (_SCaddress == undefined || _SCaddress == null || _SCaddress.length == 0) 
@@ -77,10 +77,17 @@ class SBController extends MovieClip
 			showError("Missing SqueezeCenter address.");
 			return;
 		}
-
+		
 		this.showStatus("Loading...", 0xffffff);
 		
-		getPlayers();
+		if (_root["sbcontroller_defaultplayerid"] != undefined)
+		{
+			playerSelected(new PlayerInfo(_root["sbcontroller_defaultplayerid"], "Default"));
+		}
+		else
+		{
+			getPlayers();
+		}
 	}
 	
 	//{ gets the currently registered players
@@ -142,6 +149,8 @@ class SBController extends MovieClip
 			}
 		}
 		
+		_xml = null;
+		
 		if (playerInfoArray.length == 0)
 		{
 			//no players registered
@@ -183,9 +192,15 @@ class SBController extends MovieClip
 	//}
 	
 	//{ gets the current player state
-	private function getPlayerState():Void
+	private function getPlayerState(addParamsString:String):Void
 	{
 		trace("getplayerstate: " + getTimer());
+		
+		if (_xml != null)
+		{
+			trace("A player state refresh is already in progress.");
+			return;
+		}
 		
 		_xml = new XML();
 		_xml.ignoreWhite = true;
@@ -203,6 +218,11 @@ class SBController extends MovieClip
 		}
 		url += "&start=" + urlStart;
 		
+		if (addParamsString != undefined && addParamsString != null)
+		{
+			url += addParamsString;
+		}
+		
 		//add cache tricker to skirt around caching in flash and chumby
 		url += "&cachetricker=" + getTimer();
 		trace(url);
@@ -216,9 +236,16 @@ class SBController extends MovieClip
 	
 	private function gotPlayerState(success:Boolean)
 	{
+		// this can occur if there are concurrent player state refreshes
+		if (_xml == null || !_xml.loaded)
+		{
+			return;
+		}
+		
 		if (success == false)  
 		{
 			showError("Error when getting player state.", 0xffffff);
+			_xml = null;
 			return;
 		}
 		
@@ -498,6 +525,7 @@ class SBController extends MovieClip
 			//	trace(_playerState.playlist[bbb].title + " | pos: " + _playerState.playlist[bbb].position); 
 			//}
 			
+			_xml = null;
 			getPlayerState();
 			return;
 		}
@@ -532,6 +560,9 @@ class SBController extends MovieClip
 		}
 		_playlistStrip.setShowingIndex(curItemIndex);
 		
+		// clean up
+		_xml = null;
+		
 		hideStatus();
 		
 		//activate the overlay if needed
@@ -543,7 +574,7 @@ class SBController extends MovieClip
 		else if (_playerState.playlistLength == 0)
 		{
 			//empty playlist
-			activateInactiveOverlay("playlist is empty", "access SqueezeCenter to add songs");
+			activateInactiveOverlay("playlist is empty", "use your Squeezebox to add songs");
 		}
 		else if (_playerState.playMode == PlayerState.PLAYMODE_PAUSED)
 		{
@@ -651,6 +682,7 @@ class SBController extends MovieClip
 	//{ status methods
 	private function showStatus(str:String, textColor:Number):Void
 	{
+		_messageText.embedFonts = true;
 		_messageText.text = str;
 		_messageText._visible = true;
 		
@@ -658,8 +690,8 @@ class SBController extends MovieClip
 		with (messageTextFormat)
 		{
 			color = textColor;
-			size = 15;
-			font = "Arial";
+			size = 22;
+			font = "main.ttf";
 		}
 		_messageText.setTextFormat(messageTextFormat);
 	}
@@ -685,39 +717,35 @@ class SBController extends MovieClip
 	//{ squeezebox commands
 	private function sbSendCommand(p0:String, p1:String, p2:String, p3:String, p4:String):Void
 	{
-		//base url
-		var url:String = "http://" + _SCaddress + "/xml/status.xml?player=" + escape(_playerInfo.playerId) + "&omit_playlist=1";
+		var params = "";
 		
 		//this is a required parameter
 		if (p0 == undefined || p0 == null)
 			return;
 		
-		url += "&p0=" + escape(p0);
+		params += "&p0=" + escape(p0);
 		
 		//optional parameters
 		if (p1 != undefined && p1 != null)
-			url += "&p1=" + escape(p1);
+			params += "&p1=" + escape(p1);
 		
 		if (p2 != undefined && p2 != null)
-			url += "&p2=" + escape(p2);
+			params += "&p2=" + escape(p2);
 		
 		if (p3 != undefined && p3 != null)
-			url += "&p3=" + escape(p3);
+			params += "&p3=" + escape(p3);
 		
 		if (p4 != undefined && p4 != null)
-			url += "&p4=" + escape(p4);
-		
-		//add cache tricker
-		url += "&cachetricker=" + getTimer();
+			params += "&p4=" + escape(p4);
 		
 		//add cauth
 		// cauth (CSRF protection) seems to be disabled by default on new installs
 		if (_SCcauth != undefined && _SCcauth != null)
-			url += "&;cauth=" + _SCcauth;
-		
+			params += "&;cauth=" + _SCcauth;
+			
 		//send command
-		trace("sending command: " + url);
-		loadVariables(url);
+		trace("sending command: " + params);
+		getPlayerState(params);
 	}
 	
 	private function sbPause():Void
