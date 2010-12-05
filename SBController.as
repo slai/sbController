@@ -77,12 +77,6 @@ class SBController extends MovieClip
 			showError("Missing SqueezeCenter address.");
 			return;
 		}
-		
-		if (_SCcauth == undefined || _SCcauth == null || _SCcauth.length == 0) 
-		{
-			showError("Missing SqueezeCenter cauth.");
-			return;
-		}
 
 		this.showStatus("Loading...", 0xffffff);
 		
@@ -717,7 +711,9 @@ class SBController extends MovieClip
 		url += "&cachetricker=" + getTimer();
 		
 		//add cauth
-		url += "&;cauth=" + _SCcauth;
+		// cauth (CSRF protection) seems to be disabled by default on new installs
+		if (_SCcauth != undefined && _SCcauth != null)
+			url += "&;cauth=" + _SCcauth;
 		
 		//send command
 		trace("sending command: " + url);
