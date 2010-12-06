@@ -5,7 +5,7 @@
       <widget>
         <name>sbController</name>
         <description>This is the squeezebox controller widget.</description>
-        <version>0.1</version>
+        <version>0.2</version>
         <mode time="30" mode="timeout"/>
         <access sendable="false" deleteable="false" access="private" virtualable="false"/>
         <user username="myusername"/>
@@ -15,36 +15,48 @@
       <access access="private"/>
       <mode time="30" mode="timeout"/>
       <widget_parameters>
-		<!-- Required. The address and port if necessary to your SC installation. -->
+	<!-- Required. The address and port if necessary to your SC installation. -->
         <widget_parameter>
           <name>sbcontroller_scaddress</name>
           <value>192.168.1.100:9000</value>
         </widget_parameter>
-		<!-- Required. This is an authorization code for communicating with your SC installation.
-		     It is unique to your SC installation.
-			 
-			 To get it, use your browser to navigate to:
-			 http://192.168.1.100:9000/xml/?p0=pref
-			 (replace the IP and port as required.)
-			 
-			 It will say 403 Forbidden, and there will be a link on the page similar to this:
-			 http://192.168.1.100:9000/xml/?p0=pref&;cauth=67330341438a459ca091c115041345b6
-			 
-			 Get the value after cauth= and put replace the value below. -->
+	<!-- Optional. This is an authorization code for communicating with your SC installation.
+	     It is unique to your SBS installation. It is only necessary if CSRF protection has
+	     been enabled - by default, it seems to be disabled on SBS 7.5 and up.
+	     
+	     To check if you have it enabled, go to your SBS web UI -> Settings -> Advanced tab ->
+	     Security section, and look at the CSRF Protection Level setting.
+		 
+	     If it is enabled, to get the authorization code, use your browser to navigate to:
+	     http://192.168.1.100:9000/xml/?p0=pref
+	     (replace the IP and port as required.)
+	    
+	     It will say 403 Forbidden, and there will be a link on the page similar to this:
+	     http://192.168.1.100:9000/xml/?p0=pref&;cauth=67330341438a459ca091c115041345b6
+	    
+	     Get the value after cauth= and put replace the value below. -->
         <widget_parameter>
           <name>sbcontroller_sccauth</name>
           <value>67330341438a459ca091c115041345b6</value>
         </widget_parameter>
-		<!-- Optional. If your SC installation is running on a faster server, you can try decreasing
-			 this to speed up updates. Note - SC doesn't like requests that are too frequent and 
-			 will stall requests after a period of time. Defaults to 15000 if not specified. 
-			 Number is in milliseconds. -->
-		<!-- 
-		<widget_parameter>
+	<!-- Optional. If you have multiple players connected to SBS and want to always default to
+	     a particular one, specify the ID of the player below. -->
+	<!-- 
+	<widget_parameter>
+          <name>sbcontroller_defaultplayerid</name>
+          <value>00:00:00:00:00:00</value>
+        </widget_parameter>
+	-->
+	<!-- Optional. If your SBS installation is running on a faster server, you can try decreasing
+		 this to speed up updates. Note - SBS doesn't like requests that are too frequent and 
+		 will stall requests after a period of time. Defaults to 15000 if not specified. 
+		 Number is in milliseconds. -->
+	<!-- 
+	<widget_parameter>
           <name>sbcontroller_scupdateinterval</name>
           <value>8d1047b14c64afd49eef9803ee3b8fde</value>
         </widget_parameter>
-		-->
+	-->
       </widget_parameters>
     </widget_instance>
   </widget_instances>
