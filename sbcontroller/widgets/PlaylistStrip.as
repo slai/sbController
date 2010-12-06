@@ -266,19 +266,20 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	{
 		//trace('aligner');
 		var x:Number = _x;
-		var itemIndex:Number = int(-x/_xspacing+0.5); // figure out closest image to which to align
-		var remaining = itemIndex*_xspacing+x;
-		if (_velocity>10 && remaining>0) {
-			itemIndex--;
-		} else if (_velocity<-10 && remaining<0) {
-			itemIndex++;
-		}
-		itemIndex = Math.max(0,Math.min(itemIndex,3-1));
-		_velocity = 0;
+		// -1 so -1 == prev strip item
+		var itemIndex:Number = int(-x/_xspacing+0.5) - 1; // figure out closest image to which to align
+		var remaining = itemIndex * _xspacing + x;
+		
+		// don't advance if there is no item to show
+		if (itemIndex < 0 && _prevStripItem.item == null)
+			itemIndex = 0;
+		if (itemIndex > 0 && _nextStripItem.item == null)
+			itemIndex = 0;
+		
 		_startTime = getTimer();
 		_duration = AlignTime;
 		_startX = x;
-		_deltaX = -itemIndex*_xspacing-_startX;
+		_deltaX = -(itemIndex+1)*_xspacing-_startX;
 		this.onEnterFrame = align;
 		align();
 		
@@ -295,7 +296,7 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	private function align() 
 	{
 		var t = getTimer() - _startTime;
-		//trace('align '+t);
+		
 		if (t<=_duration) 
 		{
 			var x = easeOutQuad(t,_startX,_deltaX,_duration);
@@ -305,7 +306,6 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 		} 
 		else 
 		{
-			//trace("align index = " + itemIndex);
 			_x = _startX+_deltaX; // done with this advance, force alignment
 
 			_delay = DelayTime;
@@ -315,7 +315,7 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 			// -1 so it fits with -1 as prev
 			var itemIndex:Number = Math.round(-_x/_xspacing) - 1;
 			
-			trace("DeltaX: " + _deltaX + ", itemIndex: " + itemIndex);
+			trace("align DeltaX: " + _deltaX + ", itemIndex: " + itemIndex);
 			
 			// drag from right to left
 			if (_deltaX < 0 && _curShowingIndex != itemIndex)
@@ -334,12 +334,18 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	// advance to the next image after the specified delay
 	private function advancer() 
 	{
-		//trace('advancer '+delay);
+		//trace('advancer '+_delay);
 		if (_autoAdvance == true && getTimer() > _startTime+_delay) 
 		{
 			var x:Number = _x;
-			var itemIndex:Number = Math.round(-x/_xspacing); // current image
-			if ((itemIndex < 3 /* total strip items */ -1))  // any item left?
+			// -1 so -1 == prev item
+			var itemIndex:Number = Math.round( -x / _xspacing) - 1; // current image
+			
+			trace("ADVANCER: index [" + itemIndex + "], prev item is null [" + _prevStripItem.item == null + "], next item is null [" + _nextStripItem.item == null + "]");
+			if (// don't advance if the prev or next item is null
+				(itemIndex < 0 && _prevStripItem.item != null) ||
+				(itemIndex > 0 && _nextStripItem.item != null)
+			   )
 			{ 
 				_startTime = getTimer(); // set up advance
 				_duration = AdvanceTime;

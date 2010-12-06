@@ -105,17 +105,21 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	
 	public function set item(value:PlaylistItem):Void
 	{
-		if (_item != value)
+		if (_item == null || value == null || _item.id != value.id)
 		{
 			_item = value;
 			
 			//trace("ITEM [" + _name + "]: " + _item.title);
 			
-			removeAllTextFields();
-			//generate and load UI
-			generateUI();
-			refreshUI();
-			checkLoad();
+			unloadUI();
+			
+			if (_item != null)
+			{
+				//generate and load UI
+				generateUI();
+				refreshUI();
+				checkLoad();
+			}
 		}
 	}
 	
@@ -220,22 +224,43 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_durationText._width = _durationText.textWidth + TEXT_WIDTH_LEEWAY > maxTextWidth ? maxTextWidth : _durationText.textWidth + TEXT_WIDTH_LEEWAY;
 	}
 	
-	private function removeAllTextFields():Void
+	private function unloadUI():Void
 	{
 		if (_artistText != null)
+		{
 			_artistText.removeTextField();
+			_artistText = null;
+		}
 		
 		if (_albumText != null)
+		{
 			_albumText.removeTextField();
+			_albumText = null;
+		}
 		
 		if (_titleText != null)
+		{
 			_titleText.removeTextField();
+			_titleText = null;
+		}
 		
 		if (_durationText != null)
+		{
 			_durationText.removeTextField();
+			_durationText = null;
+		}
 			
 		if (_statusText != null)
+		{
 			_statusText.removeTextField();
+			_statusText = null;
+		}
+			
+		if (_coverArt != null)
+		{
+			_mcl.unloadClip(_coverArt);
+			_coverArt = null;
+		}
 	}
 	
 	//-----------------------------------------------------------------------------------------------
