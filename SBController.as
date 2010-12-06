@@ -196,7 +196,8 @@ class SBController extends MovieClip
 	{
 		trace("getplayerstate: " + getTimer());
 		
-		if (_xml != null)
+		// proceed anyway if we have parameters; otherwise cmd won't be sent
+		if (_xml != null && (addParamsString == undefined || addParamsString == null))
 		{
 			trace("A player state refresh is already in progress.");
 			return;
