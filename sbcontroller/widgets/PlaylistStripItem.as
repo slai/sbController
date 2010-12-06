@@ -164,7 +164,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_albumText.background = true;
 		_albumText.backgroundColor = 0x000000;
 		
-		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 110, 300, 40);
+		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 110, 300, 36);
 		_titleText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
@@ -181,7 +181,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_titleText.wordWrap = true;
 		
 		
-		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 150, 300, 25);
+		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 150, 300, 30);
 		_durationText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
@@ -210,9 +210,9 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		
 		_titleText.text = item.title;
 		_titleText._width = _titleText.textWidth + TEXT_WIDTH_LEEWAY > maxTextWidth ? maxTextWidth : _titleText.textWidth + TEXT_WIDTH_LEEWAY;
-		//adjust for multi-line. 28 comes from the single line height set in generateUI.
-		//cannot rely on textHeight, as it returns a height close but too small for all line to show. weird.
-		_titleText._height = Math.ceil(_titleText.textHeight / 40) * 40;
+		//adjust for multi-line. 36 comes from the single line height set in generateUI.
+		//cannot rely on textHeight, as it returns a height close but too small for all lines to show. weird.
+		_titleText._height = Math.ceil(_titleText.textHeight / 36) * 36;
 		//trace("title: " + item.title);
 		//trace("title text width and height: " + _titleText.textWidth + " x " + _titleText.textHeight);
 		
