@@ -39,6 +39,7 @@
   <!-- Assets to embed into the output SWF -->
   <library>
     <asset path="main.ttf" />
+    <asset path="black320x240.jpg" bitmap="False" />
   </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

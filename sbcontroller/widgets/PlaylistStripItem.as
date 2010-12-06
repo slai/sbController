@@ -102,8 +102,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		
 		// HACK: load a black image to force movieclip to use 320x240 as hit area.
 		//       can't work out how to do it properly using FD.
-		_hitAreaMC = createEmptyMovieClip("hitAreaMC", HITAREA_DEPTH);
-		_mcl.loadClip("black320x240.gif", _hitAreaMC);
+		attachMovie("black320x240.jpg", "hitAreaMC", HITAREA_DEPTH, null);
 	}
 	
 	public function get item():PlaylistItem
@@ -347,10 +346,6 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	// basic resizing/centering code after the image has been loaded
 	private function onLoadInit(target:MovieClip) 
 	{
-		// skip if it is the hit area; doesn't need further processing as it is the right size.
-		if (target._name == "hitAreaMC")
-			return;
-		
 		if(target._width == 0) 
 		{
 			onLoadError(target);

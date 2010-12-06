@@ -7,6 +7,7 @@
     <library>
       <clip id="__sharepoint__" />
       <font id="main.ttf" name="main.ttf" import="main.ttf" glyphs="1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ `~!@#$%^&amp;*()-_=+[]{}\|;:'&quot;,./&lt;&gt;?" size="41388" modified="5/12/2010 7:14:51 AM" />
+      <clip id="black320x240.jpg" name="black320x240.jpg" import="black320x240.jpg" size="2749" modified="6/12/2010 4:36:21 AM" />
     </library>
   </frame>
 </movie>
