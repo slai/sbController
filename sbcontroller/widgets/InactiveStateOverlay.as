@@ -30,6 +30,9 @@
 		_messageTitle = "";
 		_message = "";
 		
+		//attach handlers
+		this.onPress = Delegate.create(this, overlayClicked);
+		
 		generateUI();
 		refreshUI();
 	}
@@ -55,6 +58,12 @@
 		if (_messageTitle != value)
 		{
 			_messageTitle = value;
+			
+			// for some odd reason, previous text artifacts remain, so need to recreate text field
+			_messageTitleText.removeTextField();
+			_messageTitleText = null;
+			generateUI();
+			
 			refreshUI();
 		}
 	}
@@ -88,37 +97,40 @@
 		this.endFill();
 		
 		//create title text
-		_messageTitleText = this.createTextField("messageTitleText", TITLETEXT_DEPTH, 0, 60, 310, 36);
-		_messageTitleText.embedFonts = true;
-		_messageTitleText.selectable = false;
-		var titleTextFormat:TextFormat = new TextFormat();
-		with (titleTextFormat)
+		if (_messageTitleText == null)
 		{
-			align = "center";
-			color = 0xffffff;
-			size = 40;
-			font = "main.ttf";
-			bold = true;
+			_messageTitleText = this.createTextField("messageTitleText", TITLETEXT_DEPTH, 0, 60, 310, 36);
+			_messageTitleText.embedFonts = true;
+			_messageTitleText.selectable = false;
+			var titleTextFormat:TextFormat = new TextFormat();
+			with (titleTextFormat)
+			{
+				align = "center";
+				color = 0xffffff;
+				size = 40;
+				font = "main.ttf";
+				bold = true;
+			}
+			_messageTitleText.setNewTextFormat(titleTextFormat);
 		}
-		_messageTitleText.setNewTextFormat(titleTextFormat);
 		
 		//create message text
-		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 130, 320, 28);
-		_messageText.embedFonts = true;
-		_messageText.selectable = false;
-		var messageTextFormat:TextFormat = new TextFormat();
-		with (messageTextFormat)
+		if (_messageText == null) 
 		{
-			align = "center";
-			color = 0x999999;
-			size = 26;
-			font = "main.ttf";
-			bold = true;
+			_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 130, 320, 28);
+			_messageText.embedFonts = true;
+			_messageText.selectable = false;
+			var messageTextFormat:TextFormat = new TextFormat();
+			with (messageTextFormat)
+			{
+				align = "center";
+				color = 0x999999;
+				size = 26;
+				font = "main.ttf";
+				bold = true;
+			}
+			_messageText.setNewTextFormat(messageTextFormat);
 		}
-		_messageText.setNewTextFormat(messageTextFormat);
-		
-		//attach handlers
-		this.onPress = Delegate.create(this, overlayClicked);
 	}
 	
 	public function refreshUI():Void
