@@ -28,7 +28,8 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	//}
 	
 	//{ constants
-	private var COVERART_DEPTH:Number = 1;
+	private var HITAREA_DEPTH:Number = 1;
+	private var COVERART_DEPTH:Number = 5;
 	private var ARTISTTEXT_DEPTH:Number = 10;
 	private var ALBUMTEXT_DEPTH:Number = 11;
 	private var TITLETEXT_DEPTH:Number = 12;
@@ -59,6 +60,8 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	private var _durationText:TextField;
 	private var _statusText:TextField;
 	private var _curCoverArtUrl:String;
+	
+	private var _hitAreaMC:MovieClip;
 	
 	private var _errorCount:Number;
 	
@@ -96,6 +99,11 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 			setHeight(_maxHeight);
 		else
 			setHeight(240);
+		
+		// HACK: load a black image to force movieclip to use 320x240 as hit area.
+		//       can't work out how to do it properly using FD.
+		_hitAreaMC = createEmptyMovieClip("hitAreaMC", HITAREA_DEPTH);
+		_mcl.loadClip("black320x240.gif", _hitAreaMC);
 	}
 	
 	public function get item():PlaylistItem
@@ -125,15 +133,6 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	
 	private function generateUI():Void
 	{
-		//paint background black so entire movieclip acts as a hotspot
-		moveTo(0, 0);
-		beginFill(0x000000, 1);
-		lineTo(0, Width);
-		lineTo(Width, Height);
-		lineTo(0, Height);
-		lineTo(0, 0);
-		endFill();
-		
 		//cover art loaded when needed
 		
 		var textFormat:TextFormat = null;
@@ -348,6 +347,10 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	// basic resizing/centering code after the image has been loaded
 	private function onLoadInit(target:MovieClip) 
 	{
+		// skip if it is the hit area; doesn't need further processing as it is the right size.
+		if (target._name == "hitAreaMC")
+			return;
+		
 		if(target._width == 0) 
 		{
 			onLoadError(target);
