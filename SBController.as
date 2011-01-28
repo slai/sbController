@@ -24,6 +24,7 @@ import sbcontroller.PlayerState;
 import sbcontroller.PlaylistItem;
 import sbcontroller.widgets.PlaylistStrip;
 import sbcontroller.widgets.PlaylistStripItem;
+import System.security;
 
 class SBController extends MovieClip
 {	
@@ -60,29 +61,32 @@ class SBController extends MovieClip
 	public function SBController()
 	{	
 		//create initial status textbox
-		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 5, 10, 300, 48);
+		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 5, 10, 300, 200);
 		_messageText.multiline = true;
 		_messageText.wordWrap = true;
 		
 		//get chumby widget variables
-		_SCaddress = _root["sbcontroller_scaddress"];
-		_SCcauth = _root["sbcontroller_sccauth"];
+		_SCaddress = _root["_private_sbcontroller_ipaddress"];
+		_SCcauth = _root["_private_sbcontroller_cauth"];
 
-		if (_root["sbcontroller_scupdateinterval"] != undefined)
-			_SCUpdateInterval = parseInt(_root["sbcontroller_scupdateinterval"]); //otherwise defaults to 5000 (above)
+		// this property is undefined when run locally, but set to an empty string when run from the chumby network
+		if (_root["_private_sbcontroller_updateInterval"] != undefined && _root["_private_sbcontroller_updateInterval"] != "")
+			_SCUpdateInterval = parseInt(_root["_private_sbcontroller_updateInterval"]); //otherwise defaults to 5000 (above)
 		
 		//validate
 		if (_SCaddress == undefined || _SCaddress == null || _SCaddress.length == 0) 
 		{
-			showError("Missing SqueezeCenter address.");
+			showError("Missing Squeezebox Server address.\n\nYou can specify the address by configuring this widget at http://www.chumby.com.");
 			return;
 		}
 		
+		security.loadPolicyFile("http://" + _SCaddress + "/crossdomain.xml");
 		this.showStatus("Loading...", 0xffffff);
 		
-		if (_root["sbcontroller_defaultplayerid"] != undefined)
+		// this property is undefined when run locally, but set to an empty string when run from the chumby network
+		if (_root["_private_sbcontroller_defaultId"] != undefined && _root["_private_sbcontroller_defaultId"] != "")
 		{
-			playerSelected(new PlayerInfo(_root["sbcontroller_defaultplayerid"], "Default"));
+			playerSelected(new PlayerInfo(_root["_private_sbcontroller_defaultId"], "Default"));
 		}
 		else
 		{
@@ -155,7 +159,7 @@ class SBController extends MovieClip
 		{
 			//no players registered
 			_playerInfo = null;
-			this.showStatus("There are no players registered with SC.", 0xffffff);
+			this.showStatus("There are no players registered with your Squeezebox Server.", 0xffffff);
 		}
 		else if (playerInfoArray.length == 1)
 		{
@@ -166,7 +170,7 @@ class SBController extends MovieClip
 		else
 		{
 			//ask user
-			this.showStatus("There are " + playerInfoArray.length + " players registered with SC.", 0xffffff);
+			this.showStatus("There are " + playerInfoArray.length + " players registered with your Squeezebox Server.", 0xffffff);
 			
 			_playerSelector = 
 					MCUtil.CreateWithClass(
