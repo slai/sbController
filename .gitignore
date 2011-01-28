@@ -1,2 +1,5 @@
 private-*.txt
 *.swf
+obj/**
+**/obj/**
+releases/**
