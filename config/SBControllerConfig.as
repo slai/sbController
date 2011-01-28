@@ -14,8 +14,8 @@ class SBControllerConfig extends MovieClip
 	//}
 	
 	//{ constants
-	private var IPADDRESSTEXT_DEPTH:Number = 10;
-	private var IPADDRESSINPUT_DEPTH:Number = 11;
+	private var ADDRESSTEXT_DEPTH:Number = 10;
+	private var ADDRESSINPUT_DEPTH:Number = 11;
 	private var CAUTHTEXT_DEPTH:Number = 12;
 	private var CAUTHINPUT_DEPTH:Number = 13;
 	private var DEFAULTIDTEXT_DEPTH:Number = 14;
@@ -32,7 +32,7 @@ class SBControllerConfig extends MovieClip
 	//}
 	
 	//{ instance variables
-	private var _ipAddressInput:TextField;
+	private var _addressInput:TextField;
 	private var _cauthInput:TextField;
 	private var _defaultIdInput:TextField;
 	private var _updateIntervalInput:TextField;
@@ -77,16 +77,16 @@ class SBControllerConfig extends MovieClip
 		// gap
 		curY += 7;
 		
-		//IP address
-		curTextField = createTextField("ipAddressText", IPADDRESSTEXT_DEPTH, 10 /* gap */, curY, 300, 20);
+		//address
+		curTextField = createTextField("addressText", ADDRESSTEXT_DEPTH, 10 /* gap */, curY, 300, 20);
 		curTextField.setNewTextFormat(tf);
-		curTextField.text = "Squeezebox Server IP address and port:";
-		curY += 20 /* height of IP address text */;
+		curTextField.text = "Squeezebox Server address & port (address:port):";
+		curY += 20 /* height of address text */;
 		
-		_ipAddressInput = createTextField("ipAddressInput", IPADDRESSINPUT_DEPTH, 10 /* gap */, curY, 300, 20);
-		_ipAddressInput.setNewTextFormat(tf);
-		_ipAddressInput.border = true;
-		_ipAddressInput.type = "input";
+		_addressInput = createTextField("addressInput", ADDRESSINPUT_DEPTH, 10 /* gap */, curY, 300, 20);
+		_addressInput.setNewTextFormat(tf);
+		_addressInput.border = true;
+		_addressInput.type = "input";
 		curY += 20 /* height of username input */;
 		
 		//cauth
@@ -152,8 +152,8 @@ class SBControllerConfig extends MovieClip
 		}
 		
 		//no error, fill text boxes
-		if (parameters["_private_sbcontroller_ipaddress"] != undefined)
-			_ipAddressInput.text = parameters["_private_sbcontroller_ipaddress"];
+		if (parameters["_private_sbcontroller_address"] != undefined)
+			_addressInput.text = parameters["_private_sbcontroller_address"];
 			
 		if (parameters["_private_sbcontroller_cauth"] != undefined)
 			_cauthInput.text = parameters["_private_sbcontroller_cauth"];
@@ -171,13 +171,21 @@ class SBControllerConfig extends MovieClip
 	{
 		//validate
 		var failedValidation:Boolean = false;
-		if (StringUtil.isNullOrEmpty(_ipAddressInput.text))
+		if (StringUtil.isNullOrEmpty(_addressInput.text))
 		{
 			failedValidation = true;
-			_ipAddressInput.background = true;
-			_ipAddressInput.backgroundColor = 0xFFFF00;
+			_addressInput.background = true;
+			_addressInput.backgroundColor = 0xFFFF00;
 			
-			showMessageOverlay("IP address is required", "This is the IP address and port of your Squeezebox Server.\n\nUse this format: <IP address>:<port>, e.g. 192.168.1.100:9000.\n\nTap to dismiss message", removeMessageOverlay);
+			showMessageOverlay("Address is required", "This is the address and port of your Squeezebox Server.\n\nUse this format: <SBS address>:<port>, e.g. 192.168.1.100:9000.\n\nTap to dismiss message", removeMessageOverlay);
+		}
+		else if (_addressInput.text.indexOf(":") < 0)
+		{
+			failedValidation = true;
+			_addressInput.background = true;
+			_addressInput.backgroundColor = 0xFFFF00;
+			
+			showMessageOverlay("Port is required", "This is the port of your Squeezebox Server. By default, it is port 9000.\n\nUse this format: <SBS address>:<port>, e.g. 192.168.1.100:9000.\n\nTap to dismiss message", removeMessageOverlay);
 		}
 		else if (!StringUtil.isNullOrEmpty(_cauthInput.text) && _cauthInput.length != 32)
 		{
@@ -185,7 +193,7 @@ class SBControllerConfig extends MovieClip
 			_cauthInput.background = true;
 			_cauthInput.backgroundColor = 0xFFFF00;
 			
-			showMessageOverlay("Cauth value is invalid", "The cauth value is 32 characters long. Visit http://<IP address>:<port>/xml/?p0=pref in your browser, find the link with the cauth parameter, copy and paste that value here.\n\nTap to dismiss message", removeMessageOverlay);
+			showMessageOverlay("Cauth value is invalid", "The cauth value is 32 characters long. Visit http://<SBS address>:<port>/xml/?p0=pref in your browser, find the link with the cauth parameter, copy and paste that value here.\n\nTap to dismiss message", removeMessageOverlay);
 		}
 		else if (!StringUtil.isNullOrEmpty(_defaultIdInput.text) && _defaultIdInput.length != 17)
 		{
@@ -211,7 +219,7 @@ class SBControllerConfig extends MovieClip
 		showMessageOverlay("saving parameters", "sending to chumby servers...");
 		WidgetParameters.setWidgetParameters(Delegate.create(this, saveCompleted), 
 			{
-				_private_sbcontroller_ipaddress : _ipAddressInput.text,
+				_private_sbcontroller_address : _addressInput.text,
 				_private_sbcontroller_cauth : _cauthInput.text,
 				_private_sbcontroller_defaultId : _defaultIdInput.text
 			}

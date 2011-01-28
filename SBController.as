@@ -66,7 +66,7 @@ class SBController extends MovieClip
 		_messageText.wordWrap = true;
 		
 		//get chumby widget variables
-		_SCaddress = _root["_private_sbcontroller_ipaddress"];
+		_SCaddress = _root["_private_sbcontroller_address"];
 		_SCcauth = _root["_private_sbcontroller_cauth"];
 
 		// this property is undefined when run locally, but set to an empty string when run from the chumby network
