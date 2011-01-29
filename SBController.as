@@ -31,6 +31,7 @@ import sbcontroller.PlayerState;
 import sbcontroller.PlaylistItem;
 import sbcontroller.widgets.PlaylistStrip;
 import sbcontroller.widgets.PlaylistStripItem;
+import sbcontroller.util.StringUtil;
 import System.security;
 
 class SBController extends MovieClip
@@ -107,6 +108,7 @@ class SBController extends MovieClip
 		_xml = new XML();
 		_xml.ignoreWhite = true;
 		_xml.onLoad = Delegate.create(this, gotPlayers);
+		// I'd like to catch the HTTPStatus, but Flash Lite doesn't support onHTTPStatus. Weird.
 		
 		var url:String = "http://" + _SCaddress + "/xml/status_header.xml";
 		
@@ -123,6 +125,16 @@ class SBController extends MovieClip
 		if (success == false)  
 		{
 			this.showStatus("Error when getting players.", 0xffffff);
+			removeInactiveOverlay();
+			_xml = null;
+			return;
+		}
+		
+		if (_xml.status != 0)
+		{
+			this.showStatus("Error when getting players - XML error code " + _xml.status + ".", 0xffffff);
+			removeInactiveOverlay();
+			_xml = null;
 			return;
 		}
 		
@@ -131,6 +143,8 @@ class SBController extends MovieClip
 		if (playersNode == null)
 		{
 			this.showStatus("Error when getting players - invalid XML.", 0xffffff);
+			removeInactiveOverlay();
+			_xml = null;
 			return;
 		}
 		
@@ -230,13 +244,15 @@ class SBController extends MovieClip
 		}
 		url += "&start=" + urlStart;
 		
+		//add cache tricker to skirt around caching in flash and chumby
+		url += "&cachetricker=" + getTimer();
+		
+		// this must be the last addition to the URL because it may contain the cauth value, which must be at the end of the URL.
 		if (addParamsString != undefined && addParamsString != null)
 		{
 			url += addParamsString;
 		}
 		
-		//add cache tricker to skirt around caching in flash and chumby
-		url += "&cachetricker=" + getTimer();
 		trace(url);
 			
 		_xml.load(url);
@@ -257,8 +273,32 @@ class SBController extends MovieClip
 		if (success == false)  
 		{
 			showError("Error when getting player state.", 0xffffff);
+			removeInactiveOverlay();
 			_xml = null;
 			return;
+		}
+		
+		if (_xml.status != 0)
+		{
+			// HACK: no other way to detect if HTML is returned unless with onData. This works because the error HTML is not XHTML and has un-paired tags.
+			//       Ideally would like to check based on HTTP status (unavailable in Flash Lite) or check HTML content (XML object can't parse HTML).
+			if (_xml.status == -10)
+			{
+				if (StringUtil.isNullOrEmpty(_SCcauth))
+					activateInactiveOverlay("cauth not configured", "Visit http://goo.gl/amubj for instructions to fix this error.");
+				else
+					activateInactiveOverlay("cauth invalid", "Visit http://goo.gl/amubj for instructions to fix this error.");
+				
+				// don't null out _xml here because we don't want this message to go away (when player state timer expires)
+				return;
+			}
+			else 
+			{
+				showError("Error when getting player state - XML error code " + _xml.status + ".", 0xffffff);
+				removeInactiveOverlay();
+				_xml = null;
+				return;
+			}
 		}
 		
 		//variables for storing current playlist offset
@@ -747,6 +787,7 @@ class SBController extends MovieClip
 		
 		//add cauth
 		// cauth (CSRF protection) seems to be disabled by default on new installs
+		// must be added at the end of the URL
 		if (_SCcauth != undefined && _SCcauth != null)
 			params += "&;cauth=" + _SCcauth;
 			
