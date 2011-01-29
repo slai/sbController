@@ -1,4 +1,11 @@
 ﻿/* 
+
+sbController Widget for Chumby and Squeezebox Server 7.3 and up.
+Samuel Lai, sam@edgylogic.com
+https://github.com/slai/sbController/wiki/
+
+This code has been derived from code with the following copyright message:
+
 Copyright (c) 2008 Chumby Industries
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
