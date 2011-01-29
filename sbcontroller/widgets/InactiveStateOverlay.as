@@ -14,6 +14,7 @@
 	private var MC_HEIGHT:Number = 240;
 	private var TITLETEXT_DEPTH:Number = 1;
 	private var MESSAGETEXT_DEPTH:Number = 2;
+	private var TITLE_MESSAGE_GAP:Number = 20;
 	//}
 	
 	//{ instance variables
@@ -117,9 +118,11 @@
 		//create message text
 		if (_messageText == null) 
 		{
-			_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 130, 320, 28);
+			_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 130, 320, 180);
 			_messageText.embedFonts = true;
 			_messageText.selectable = false;
+			_messageText.multiline = true;
+			_messageText.wordWrap = true;
 			var messageTextFormat:TextFormat = new TextFormat();
 			with (messageTextFormat)
 			{
@@ -137,6 +140,15 @@
 	{
 		_messageTitleText.text = _messageTitle;
 		_messageText.text = _message;
+		
+		// center the text vertically
+		var totalHeight:Number = _messageTitleText.textHeight + TITLE_MESSAGE_GAP + _messageText.textHeight;
+		var newY:Number = (MC_HEIGHT - totalHeight) / 2;
+		
+		if (newY < 0) newY = 0;
+		
+		_messageTitleText._y = newY;
+		_messageText._y = newY + _messageTitleText.textHeight + TITLE_MESSAGE_GAP;
 	}
 	
 	private function overlayClicked():Void
