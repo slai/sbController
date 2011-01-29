@@ -93,7 +93,7 @@ class SBControllerConfig extends MovieClip
 		curY += 10 /* gap */;
 		curTextField = createTextField("cauthText", CAUTHTEXT_DEPTH, 10 /* gap */, curY, 300, 20);
 		curTextField.setNewTextFormat(tf);
-		curTextField.text = "CAuth (if CSRF protection is on; off by default):";
+		curTextField.text = "CAuth (optional, 32 characters):";
 		curY += 20 /* height of cauth text */;
 		
 		_cauthInput = createTextField("cauthInput", CAUTHINPUT_DEPTH, 10 /* gap */, curY, 300, 20);
