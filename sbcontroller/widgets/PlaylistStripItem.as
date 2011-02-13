@@ -257,6 +257,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		if (_coverArt != null)
 		{
 			_mcl.unloadClip(_coverArt);
+			_curCoverArtUrl = "";
 			_coverArt = null;
 		}
 	}
