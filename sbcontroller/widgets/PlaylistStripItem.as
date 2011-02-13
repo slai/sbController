@@ -149,6 +149,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_artistText.setNewTextFormat(textFormat);
 		_artistText.background = true;
 		_artistText.backgroundColor = 0x000000;
+		_artistText._alpha = 75;
 
 		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 80, 300, 30);
 		_albumText.embedFonts = true;
@@ -163,6 +164,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_albumText.setNewTextFormat(textFormat);
 		_albumText.background = true;
 		_albumText.backgroundColor = 0x000000;
+		_albumText._alpha = 75;
 		
 		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 110, 300, 36);
 		_titleText.embedFonts = true;
@@ -177,9 +179,9 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_titleText.setNewTextFormat(textFormat);
 		_titleText.background = true;
 		_titleText.backgroundColor = 0x000000;
+		_titleText._alpha = 80;
 		_titleText.multiline = true;
 		_titleText.wordWrap = true;
-		
 		
 		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 150, 300, 30);
 		_durationText.embedFonts = true;
@@ -194,6 +196,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_durationText.setNewTextFormat(textFormat);
 		_durationText.background = true;
 		_durationText.backgroundColor = 0x000000;
+		_durationText._alpha = 75;
 		
 		_statusText = this.createTextField("statusText", STATUSTEXT_DEPTH, 5, 210, 310, 24);
 	}
