@@ -8,7 +8,7 @@ import sbcontroller.PlayerInfo;
 class sbcontroller.widgets.PlayerSelectorButton extends MovieClip
 {
 	//constants
-	public static var MC_WIDTH:Number = 300;
+	public static var MC_WIDTH:Number = 780;
 	public static var MC_HEIGHT:Number = 40;
 	private var BG_RADIUS:Number = 10;
 	private var NAMETEXT_DEPTH:Number = 1;
@@ -56,7 +56,7 @@ class sbcontroller.widgets.PlayerSelectorButton extends MovieClip
 		this.endFill();
 		
 		//create name
-		var nameText:TextField = this.createTextField("nameText", NAMETEXT_DEPTH, 5, 5, 300, 20);
+		var nameText:TextField = this.createTextField("nameText", NAMETEXT_DEPTH, 5, 5, 780, 20);
 		nameText.text = " " + _playerInfo.playerName; //add space to avoid first char being chopped off
 		nameText.selectable = false;
 		var nameTextFormat:TextFormat = new TextFormat();
@@ -70,7 +70,7 @@ class sbcontroller.widgets.PlayerSelectorButton extends MovieClip
 		nameText.setTextFormat(nameTextFormat);
 		
 		//create id
-		var idText:TextField = this.createTextField("idText", IDTEXT_DEPTH, 5, 20, 300, 14);
+		var idText:TextField = this.createTextField("idText", IDTEXT_DEPTH, 5, 20, 780, 14);
 		idText.text = " " + _playerInfo.playerId; //added space for consistency
 		idText.selectable = false;
 		var idTextFormat:TextFormat = new TextFormat();

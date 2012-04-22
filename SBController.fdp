@@ -6,8 +6,8 @@
     <movie input="" />
     <movie path="SBController.swf" />
     <movie fps="12" />
-    <movie width="320" />
-    <movie height="240" />
+    <movie width="800" />
+    <movie height="600" />
     <movie version="8" />
     <movie background="#000000" />
   </output>
@@ -39,7 +39,7 @@
   <!-- Assets to embed into the output SWF -->
   <library>
     <asset path="main.ttf" />
-    <asset path="black320x240.jpg" bitmap="False" />
+    <asset path="black800x600.jpg" bitmap="False" />
   </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

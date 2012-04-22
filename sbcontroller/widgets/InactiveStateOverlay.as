@@ -10,8 +10,8 @@
  class sbcontroller.widgets.InactiveStateOverlay extends MovieClip
 {
 	//{ constants
-	private var MC_WIDTH:Number = 320;
-	private var MC_HEIGHT:Number = 240;
+	private var MC_WIDTH:Number = 800;
+	private var MC_HEIGHT:Number = 600;
 	private var TITLETEXT_DEPTH:Number = 1;
 	private var MESSAGETEXT_DEPTH:Number = 2;
 	private var TITLE_MESSAGE_GAP:Number = 20;
@@ -100,7 +100,7 @@
 		//create title text
 		if (_messageTitleText == null)
 		{
-			_messageTitleText = this.createTextField("messageTitleText", TITLETEXT_DEPTH, 0, 60, 310, 36);
+			_messageTitleText = this.createTextField("messageTitleText", TITLETEXT_DEPTH, 10, 380, 780, 36);
 			_messageTitleText.embedFonts = true;
 			_messageTitleText.selectable = false;
 			var titleTextFormat:TextFormat = new TextFormat();
@@ -118,7 +118,7 @@
 		//create message text
 		if (_messageText == null) 
 		{
-			_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 0, 130, 320, 180);
+			_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 10, 430, 780, 180);
 			_messageText.embedFonts = true;
 			_messageText.selectable = false;
 			_messageText.multiline = true;

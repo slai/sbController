@@ -10,8 +10,8 @@ import sbcontroller.PlayerInfo;
 class sbcontroller.widgets.PlayerSelector extends MovieClip
 {
 	//constants
-	private var MC_WIDTH:Number = 320;
-	private var MC_HEIGHT:Number = 240;
+	private var MC_WIDTH:Number = 800;
+	private var MC_HEIGHT:Number = 600;
 	private var HEADERTEXT_DEPTH:Number = 1;
 	private var PLAYERBUTTON_START_DEPTH:Number = 10;
 	private var PLAYERBUTTON_Y_OFFSET:Number = 40;
@@ -55,7 +55,7 @@ class sbcontroller.widgets.PlayerSelector extends MovieClip
 		this.endFill();
 		
 		//create header
-		var headerText:TextField = this.createTextField("headerText", HEADERTEXT_DEPTH, 10, 10, 300, 24);
+		var headerText:TextField = this.createTextField("headerText", HEADERTEXT_DEPTH, 10, 10, 780, 24);
 		headerText.text = "Select a player";
 		headerText.selectable = false;
 		var headerTextFormat:TextFormat = new TextFormat();

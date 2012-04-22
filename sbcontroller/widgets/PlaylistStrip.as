@@ -21,6 +21,9 @@ import sbcontroller.widgets.PlaylistStripItem;
 
 class sbcontroller.widgets.PlaylistStrip extends MovieClip
 {
+	private var MC_WIDTH:Number = 800;
+	private var MC_HEIGHT:Number = 600;
+	
 	private static var InitialDelayTime:Number = 4000; // ms
 	private static var DelayTime:Number = 4000; // ms
 	private static var AlignTime:Number = 500; // ms
@@ -66,9 +69,9 @@ class sbcontroller.widgets.PlaylistStrip extends MovieClip
 	{
 		_isStopped = true;
 		_autoAdvance = false;
-		_xspacing = 320;
-		_itemWidth = 320;
-		_itemHeight = 240;
+		_xspacing = MC_WIDTH;
+		_itemWidth = MC_WIDTH;
+		_itemHeight = MC_HEIGHT;
 		_stripItemsAdded = false;
 		GDispatcher.initialize(this);
 		_delegateFirstItemReady = Delegate.create(this, firstItemReady);

@@ -37,10 +37,14 @@ import System.security;
 class SBController extends MovieClip
 {	
 	//{ constants
+	private var MC_WIDTH:Number = 800;
+	private var MC_HEIGHT:Number = 600;
+	
 	private var PLAYER_SELECTOR_DEPTH:Number = 1000;
 	private var INACTIVE_OVERLAY_DEPTH:Number = 1000;
 	private var MESSAGETEXT_DEPTH:Number = 100;
 	private var PLAYLISTSTRIP_DEPTH:Number = 1;
+	private var TIMEBAR_HEIGHT:Number = 10;
 	//}
 	
 	//{ instance variables
@@ -69,14 +73,14 @@ class SBController extends MovieClip
 	public function SBController()
 	{	
 		//create initial status textbox
-		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 5, 10, 300, 200);
+		_messageText = this.createTextField("messageText", MESSAGETEXT_DEPTH, 5, 10, 780, 200);
 		_messageText.multiline = true;
 		_messageText.wordWrap = true;
 		
 		//get chumby widget variables
 		_SCaddress = _root["_private_sbcontroller_address"];
 		_SCcauth = _root["_private_sbcontroller_cauth"];
-
+		
 		// this property is undefined when run locally, but set to an empty string when run from the chumby network
 		if (_root["_private_sbcontroller_updateInterval"] != undefined && _root["_private_sbcontroller_updateInterval"] != "")
 			_SCUpdateInterval = parseInt(_root["_private_sbcontroller_updateInterval"]); //otherwise defaults to 5000 (above)
@@ -406,11 +410,11 @@ class SBController extends MovieClip
 			if (curValue != null)
 				_playerState.playlistLength = parseInt(curValue);
 				
-			curValue = XmlUtil.firstValueOfType(curNode, "secondsElapsed");
+			curValue = XmlUtil.firstValueOfType(curNode, "seconds_elapsed");
 			if (curValue != null)
 				_playerState.secondsElapsed = parseInt(curValue);
 				
-			curValue = XmlUtil.firstValueOfType(curNode, "secondsTotal");
+			curValue = XmlUtil.firstValueOfType(curNode, "seconds_total");
 			if (curValue != null)
 				_playerState.secondsTotal = parseInt(curValue);
 		}
@@ -605,6 +609,23 @@ class SBController extends MovieClip
 		
 		//update UI
 		_playlistStrip.processItems(prevStripItem, curStripItem, nextStripItem);
+		
+		// draw the time bar
+		// clear that area first
+		moveTo(0, MC_HEIGHT);
+		beginFill(0x000000, 100);
+		lineTo(MC_WIDTH, MC_HEIGHT);
+		lineTo(MC_WIDTH, MC_HEIGHT - TIMEBAR_HEIGHT);
+		lineTo(0, MC_HEIGHT - TIMEBAR_HEIGHT);
+		endFill();
+		
+		// now draw the time bar
+		moveTo(0, MC_HEIGHT);
+		beginFill(0xFFFF00, 100);
+		lineTo(MC_WIDTH * (_playerState.secondsPercent / 100), MC_HEIGHT);
+		lineTo(MC_WIDTH * (_playerState.secondsPercent / 100), MC_HEIGHT - TIMEBAR_HEIGHT);
+		lineTo(0, MC_HEIGHT - TIMEBAR_HEIGHT);
+		endFill();
 		
 		// clean up
 		_xml = null;

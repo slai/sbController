@@ -28,6 +28,12 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	//}
 	
 	//{ constants
+	private var MC_WIDTH:Number = 800;
+	private var MC_HEIGHT:Number = 600;
+	
+	private var COVERART_PADDING_TOP:Number = 10;
+	private var METADATA_HEIGHT:Number = 130 + 10 /* padding bottom */;
+	
 	private var HITAREA_DEPTH:Number = 1;
 	private var COVERART_DEPTH:Number = 5;
 	private var ARTISTTEXT_DEPTH:Number = 10;
@@ -93,16 +99,17 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		if(_maxWidth != undefined)
 			setWidth(_maxWidth);
 		else
-			setWidth(320);
+			setWidth(MC_WIDTH);
 			
 		if(_maxHeight != undefined)
 			setHeight(_maxHeight);
 		else
-			setHeight(240);
+			setHeight(MC_HEIGHT);
 		
-		// HACK: load a black image to force movieclip to use 320x240 as hit area.
+		// HACK: load a black image to force movieclip to use the entire screen as hit area.
 		//       can't work out how to do it properly using FD.
-		attachMovie("black320x240.jpg", "hitAreaMC", HITAREA_DEPTH, null);
+		// NOTE: the image is actually 800x590; otherwise we can't see the time bar.
+		attachMovie("black800x600.jpg", "hitAreaMC", HITAREA_DEPTH, null);
 	}
 	
 	public function get item():PlaylistItem
@@ -136,7 +143,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		
 		var textFormat:TextFormat = null;
 		
-		_artistText = this.createTextField("artistText", ARTISTTEXT_DEPTH, 10, 50, 300, 30);
+		_artistText = this.createTextField("artistText", ARTISTTEXT_DEPTH, 10, 460, 780, 30);
 		_artistText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
@@ -147,11 +154,11 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 			bold = true;
 		}
 		_artistText.setNewTextFormat(textFormat);
-		_artistText.background = true;
-		_artistText.backgroundColor = 0x000000;
-		_artistText._alpha = 75;
+		//_artistText.background = true;
+		//_artistText.backgroundColor = 0x000000;
+		//_artistText._alpha = 75;
 
-		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 80, 300, 30);
+		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 490, 780, 30);
 		_albumText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
@@ -162,11 +169,11 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 			bold = true;
 		}
 		_albumText.setNewTextFormat(textFormat);
-		_albumText.background = true;
-		_albumText.backgroundColor = 0x000000;
-		_albumText._alpha = 75;
+		//_albumText.background = true;
+		//_albumText.backgroundColor = 0x000000;
+		//_albumText._alpha = 75;
 		
-		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 110, 300, 36);
+		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 520, 780, 36);
 		_titleText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
@@ -177,13 +184,13 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 			bold = true;
 		}
 		_titleText.setNewTextFormat(textFormat);
-		_titleText.background = true;
-		_titleText.backgroundColor = 0x000000;
-		_titleText._alpha = 80;
+		//_titleText.background = true;
+		//_titleText.backgroundColor = 0x000000;
+		//_titleText._alpha = 80;
 		_titleText.multiline = true;
 		_titleText.wordWrap = true;
 		
-		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 150, 300, 30);
+		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 560, 780, 30);
 		_durationText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
@@ -194,11 +201,11 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 			bold = true;
 		}
 		_durationText.setNewTextFormat(textFormat);
-		_durationText.background = true;
-		_durationText.backgroundColor = 0x000000;
-		_durationText._alpha = 75;
+		//_durationText.background = true;
+		//_durationText.backgroundColor = 0x000000;
+		//_durationText._alpha = 75;
 		
-		_statusText = this.createTextField("statusText", STATUSTEXT_DEPTH, 5, 210, 310, 24);
+		_statusText = this.createTextField("statusText", STATUSTEXT_DEPTH, 10, (Height - COVERART_PADDING_TOP - METADATA_HEIGHT) / 2, 780, 24);
 	}
 	
 	private function refreshUI():Void
@@ -362,15 +369,15 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		dispatchEvent({type:LOADED, name:this._name});
 		hideStatus();
 		var scaleX:Number = Math.min(1, Width/_coverArt._width);
-		var scaleY:Number = Math.min(1, Height/_coverArt._height);
+		var scaleY:Number = Math.min(1, (Height - COVERART_PADDING_TOP - METADATA_HEIGHT)/_coverArt._height);
 		var scale:Number = Math.min(scaleX,scaleY);
 		if(scale != 1) 
 		{
 			_coverArt._width  = scale * _coverArt._width;
 			_coverArt._height = scale * _coverArt._height;
 		}
-		_coverArt._x = (Width-_coverArt._width)/2;
-		_coverArt._y = (Height-_coverArt._height)/2;
+		_coverArt._x = (Width - _coverArt._width)/2;
+		_coverArt._y = COVERART_PADDING_TOP + (Height - COVERART_PADDING_TOP - METADATA_HEIGHT -_coverArt._height)/2;
 	}
 	
 	//-----------------------------------------------------------------------------------------------
