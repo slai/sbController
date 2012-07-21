@@ -32,7 +32,7 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 	private var MC_HEIGHT:Number = 600;
 	
 	private var COVERART_PADDING_TOP:Number = 10;
-	private var METADATA_HEIGHT:Number = 130 + 10 /* padding bottom */;
+	private var METADATA_HEIGHT:Number = 180 + 10 /* padding bottom */;
 	
 	private var HITAREA_DEPTH:Number = 1;
 	private var COVERART_DEPTH:Number = 5;
@@ -143,13 +143,13 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		
 		var textFormat:TextFormat = null;
 		
-		_artistText = this.createTextField("artistText", ARTISTTEXT_DEPTH, 10, 460, 780, 30);
+		_artistText = this.createTextField("artistText", ARTISTTEXT_DEPTH, 10, 410, 780, 36);
 		_artistText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 22;
+			size = 36;
 			font = "main.ttf";
 			bold = true;
 		}
@@ -158,13 +158,13 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		//_artistText.backgroundColor = 0x000000;
 		//_artistText._alpha = 75;
 
-		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 490, 780, 30);
+		_albumText = this.createTextField("albumText", ALBUMTEXT_DEPTH, 10, 448, 780, 36);
 		_albumText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 22;
+			size = 36;
 			font = "main.ttf";
 			bold = true;
 		}
@@ -173,13 +173,13 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		//_albumText.backgroundColor = 0x000000;
 		//_albumText._alpha = 75;
 		
-		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 520, 780, 36);
+		_titleText = this.createTextField("titleText", TITLETEXT_DEPTH, 10, 494, 780, 42);
 		_titleText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 28;
+			size = 42;
 			font = "main.ttf";
 			bold = true;
 		}
@@ -190,13 +190,13 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_titleText.multiline = true;
 		_titleText.wordWrap = true;
 		
-		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 560, 780, 30);
+		_durationText = this.createTextField("durationText", DURATIONTEXT_DEPTH, 10, 550, 780, 34);
 		_durationText.embedFonts = true;
 		textFormat = new TextFormat();
 		with (textFormat)
 		{
 			color = 0xffffff;
-			size = 20;
+			size = 34;
 			font = "main.ttf";
 			bold = true;
 		}
@@ -220,11 +220,11 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		
 		_titleText.text = item.title;
 		_titleText._width = _titleText.textWidth + TEXT_WIDTH_LEEWAY > maxTextWidth ? maxTextWidth : _titleText.textWidth + TEXT_WIDTH_LEEWAY;
-		//adjust for multi-line. 36 comes from the single line height set in generateUI.
+		//adjust for multi-line. 48 comes from the single line height set in generateUI.
 		//cannot rely on textHeight, as it returns a height close but too small for all lines to show. weird.
-		_titleText._height = Math.ceil(_titleText.textHeight / 36) * 36;
-		//trace("title: " + item.title);
-		//trace("title text width and height: " + _titleText.textWidth + " x " + _titleText.textHeight);
+		_titleText._height = Math.ceil(_titleText.textHeight / 48) * 48;
+		trace("title: " + item.title);
+		trace("title text width and height: " + _titleText.textWidth + " x " + _titleText.textHeight);
 		
 		//relocate duration so it is below any multi-line title
 		_durationText._y = _titleText._y + _titleText._height;
