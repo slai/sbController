@@ -368,9 +368,13 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		_loadState = LOADED;
 		dispatchEvent({type:LOADED, name:this._name});
 		hideStatus();
-		var scaleX:Number = Math.min(1, Width/_coverArt._width);
-		var scaleY:Number = Math.min(1, (Height - COVERART_PADDING_TOP - METADATA_HEIGHT)/_coverArt._height);
-		var scale:Number = Math.min(scaleX,scaleY);
+		// we want to scale the image up to fit the available space (because this is a large screen)
+		var scaleX:Number = Width / _coverArt._width;
+		//trace('Width: ' + Width + ' art width: ' + _coverArt._width + ' scaleX: ' + scaleX);
+		var scaleY:Number = (Height - COVERART_PADDING_TOP - METADATA_HEIGHT) / _coverArt._height;
+		//trace('Height: ' + (Height - COVERART_PADDING_TOP - METADATA_HEIGHT) + ' art height: ' + _coverArt._height + ' scaleY: ' + scaleY);
+		var scale:Number = Math.min(scaleX, scaleY);
+		//trace('scale: ' + scale);
 		if(scale != 1) 
 		{
 			_coverArt._width  = scale * _coverArt._width;
