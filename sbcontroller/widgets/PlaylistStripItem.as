@@ -223,8 +223,8 @@ class sbcontroller.widgets.PlaylistStripItem extends MovieClip
 		//adjust for multi-line. 48 comes from the single line height set in generateUI.
 		//cannot rely on textHeight, as it returns a height close but too small for all lines to show. weird.
 		_titleText._height = Math.ceil(_titleText.textHeight / 48) * 48;
-		trace("title: " + item.title);
-		trace("title text width and height: " + _titleText.textWidth + " x " + _titleText.textHeight);
+		//trace("title: " + item.title);
+		//trace("title text width and height: " + _titleText.textWidth + " x " + _titleText.textHeight);
 		
 		//relocate duration so it is below any multi-line title
 		_durationText._y = _titleText._y + _titleText._height;
